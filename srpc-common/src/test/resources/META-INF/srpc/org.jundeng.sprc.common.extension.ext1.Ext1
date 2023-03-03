@@ -1,0 +1,3 @@
+# test file
+impl1=org.jundeng.sprc.common.extension.ext1.impl.Ext1Impl1
+impl2=org.jundeng.sprc.common.extension.ext1.impl.Ext1Impl2

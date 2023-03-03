@@ -1,0 +1,1 @@
+default=org.jundeng.srpc.common.config.loader.impl.DefaultConfigLoader

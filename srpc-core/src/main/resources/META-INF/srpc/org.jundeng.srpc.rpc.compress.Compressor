@@ -1,0 +1,2 @@
+gzip=org.jundeng.srpc.rpc.compress.impl.GzipCompressor
+default=org.jundeng.srpc.core.compress.impl.DefaultCompressor
