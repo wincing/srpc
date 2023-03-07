@@ -12,11 +12,8 @@ public class ServiceInfo {
     /** 权重 **/
     private Integer weight;
 
-    /** 提供服务接口名 format: org.jundeng.srpc.registry.redis.RedisRegistry#doRegister **/
+    /** 提供服务接口名 format: org.jundeng.srpc.registry.redis.RedisRegistry **/
     private String interfaceName;
-
-    /** 服务别名 **/
-    private String alias;
 
     /** 服务地址 format: hostname:port **/
     private String url;

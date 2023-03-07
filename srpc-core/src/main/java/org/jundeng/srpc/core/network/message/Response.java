@@ -3,7 +3,7 @@ package org.jundeng.srpc.core.network.message;
 import lombok.Data;
 
 @Data
-public class Response<T> {
+public class Response {
 
     private byte serializeId;
 
@@ -11,7 +11,7 @@ public class Response<T> {
 
     private long streamId;
 
-    private T result;
+    private Object result;
 
     private Object exceptionInfo;
 }

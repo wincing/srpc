@@ -3,36 +3,55 @@ package org.jundeng.srpc.core.network.server;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
-import org.jundeng.srpc.core.network.message.Request;
+import org.jundeng.srpc.core.network.codec.RequestDecoder;
+import org.jundeng.srpc.core.network.codec.ResponseEncoder;
+import org.jundeng.srpc.core.network.codec.SRpcMessageDecoder;
+import org.jundeng.srpc.core.network.codec.SRpcMessageEncoder;
+import org.jundeng.srpc.core.network.idle.ServerIdleCheckHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 服务端：发送Response，接收Request
  */
 public class RpcServerSocket implements Runnable {
-    private ChannelFuture channelFuture;
-    private final Request request;
 
-    public RpcServerSocket(Request request) {
-        this.request = request;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(RpcServerSocket.class);
+
+    private ChannelFuture channelFuture;
 
     @Override
     public void run() {
-        NioEventLoopGroup bossGroup = new NioEventLoopGroup();
+        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1); // 只需1个线程监听请求即可
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
         ServerBootstrap serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<NioSocketChannel>() {
-            @Override
-            protected void initChannel(NioSocketChannel ch) throws Exception {
+        serverBootstrap
+            .group(bossGroup, workerGroup)
+            .channel(NioServerSocketChannel.class)
+            .childHandler(new ChannelInitializer<NioSocketChannel>() {
+                @Override
+                protected void initChannel(NioSocketChannel ch) throws Exception {
+                    ChannelPipeline pipeline = ch.pipeline();
 
-            }
-        });
+                    pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
+                    pipeline.addLast("idleChecker", new ServerIdleCheckHandler());
+
+                    pipeline.addLast("srpcMessageDecoder", new SRpcMessageDecoder());
+                    pipeline.addLast("message2RequestDecoder", new RequestDecoder());
+
+                    pipeline.addLast("srpcMessageEncoder", new SRpcMessageEncoder());
+                    pipeline.addLast("response2MessageEncoder", new ResponseEncoder());
+                }
+            });
 
         try {
             this.channelFuture = serverBootstrap.bind(getAvailablePort()).sync();
@@ -54,6 +73,7 @@ public class RpcServerSocket implements Runnable {
     public int getAvailablePort() {
         for (int i = MIN_PORT; i <= MAX_PORT; i++) {
             try (ServerSocket serverSocket = new ServerSocket(i, 1)) {
+                logger.debug("ServerSocket start with port: " + serverSocket.getLocalPort());
                 return serverSocket.getLocalPort();
             } catch (IOException ignored) {
             }

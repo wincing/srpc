@@ -7,6 +7,9 @@ import org.jundeng.srpc.loadbalance.common.ServiceInfo;
 public interface Registry {
     Boolean register(ServiceInfo serviceInfo);
 
+    /**
+     * @return service url
+     */
     String getService(ServiceInfo serviceInfo);
 
     void unRegister(ServiceInfo serviceInfo);

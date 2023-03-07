@@ -107,7 +107,7 @@ public class RedisRegistry extends AbstractRegistry {
      * format: srpc/com.jundeng.xxxService/providers_alias
      */
     private String toCategoryPath(ServiceInfo serviceInfo) {
-        return Constants.SRPC_SERVICE_PREFIX + serviceInfo.getInterfaceName() + Constants.URL_SEPARATOR + serviceInfo.getAlias();
+        return Constants.SRPC_SERVICE_PREFIX + serviceInfo.getInterfaceName() + Constants.URL_SEPARATOR + "providers";
     }
 
     /**
@@ -186,7 +186,7 @@ public class RedisRegistry extends AbstractRegistry {
 
         List<ServiceInfo> serviceInfoList = new ArrayList<>();
         for (String url : subscribed.get(serviceKey)) {
-            final ServiceInfo s = new ServiceInfo();
+            ServiceInfo s = new ServiceInfo();
             s.setUrl(url);
             s.setInterfaceName(serviceInfo.getInterfaceName());
             serviceInfoList.add(s);

@@ -24,7 +24,7 @@
     </dependency>
     <dependency>
       <groupId>org.jundeng</groupId>
-      <artifactId>srpc-common</artifactId>
+      <artifactId>srpc-registry</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
