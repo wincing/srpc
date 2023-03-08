@@ -18,7 +18,7 @@ public class ResponseEncoder extends MessageToMessageEncoder<Response> {
         SRpcMessageHeader srpcMessageHeader = new SRpcMessageHeader();
 
         // 填充消息头，此处长度还未被计算，不需要传，
-        srpcMessageHeader.setEventType(MessageConstants.EVENT_REQUEST);
+        srpcMessageHeader.setEventType(MessageConstants.EVENT_RESPONSE);
         srpcMessageHeader.setSerializeId(response.getSerializeId());
         srpcMessageHeader.setCompressId(response.getCompressId());
         srpcMessageHeader.setStreamId(response.getStreamId());

@@ -11,12 +11,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.jundeng.srpc.common.util.Holder;
 import org.jundeng.srpc.common.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 加载拓展插件
  * 每个拓展类加载器对应一个拓展类接口
  */
 public class ExtensionLoader<T> {
+
+    private static  final Logger logger = LoggerFactory.getLogger(ExtensionLoader.class);
+
 
     /** 扩展类存放的目录地址 **/
     private static final String EXTENSION_PATH = "META-INF/srpc/";
@@ -114,6 +119,9 @@ public class ExtensionLoader<T> {
         }
     }
 
+    /**
+     * 获取所有拓展实现类
+     */
     private Map<String, Class<?>> getExtensionClasses() {
         Map<String, Class<?>> classes = classesCached.get();
         if (classes == null) {
@@ -136,10 +144,14 @@ public class ExtensionLoader<T> {
 
         try {
             Enumeration<URL> resources = classLoader.getResources(fileName);
-            while (resources.hasMoreElements()) {
-                URL resourceURL = resources.nextElement();
-                // 解析配置文件
-                loadResource(extensionClasses, classLoader, resourceURL);
+            if (resources.hasMoreElements()) {
+                while (resources.hasMoreElements()) {
+                    URL resourceURL = resources.nextElement();
+                    // 解析配置文件
+                    loadResource(extensionClasses, classLoader, resourceURL);
+                }
+            } else {
+                logger.error("File not exist: " + fileName);
             }
         } catch (IOException e) {
             e.printStackTrace();

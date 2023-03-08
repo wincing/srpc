@@ -10,7 +10,7 @@ public abstract class AbstractRegistry implements Registry {
     private String type;
 
     /** 注册服务集合 **/
-    private final Set<ServiceInfo> registered = new ConcurrentHashSet<>();
+    protected final Set<ServiceInfo> registered = new ConcurrentHashSet<>();
 
     public String getType() {
         return type;

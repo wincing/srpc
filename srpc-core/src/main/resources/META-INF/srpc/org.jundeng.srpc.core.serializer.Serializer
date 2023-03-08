@@ -1,0 +1,2 @@
+protostuff=org.jundeng.srpc.core.serializer.impl.ProtostuffSerializer
+json=org.jundeng.srpc.core.serializer.impl.JsonSerializer

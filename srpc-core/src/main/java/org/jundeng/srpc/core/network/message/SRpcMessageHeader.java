@@ -11,8 +11,8 @@ import lombok.Data;
  * eventType（事件类型: 0为请求，1为响应包, 2为心跳） 1B
  * serializeId（序列化id） 1B
  * compressId（压缩协议id） 1B
- * streamId（通信id） 4B
- * length（消息长度） 2B
+ * streamId（通信id） 8B
+ * length（消息长度） 4B
  * </pre>
  */
 @Data

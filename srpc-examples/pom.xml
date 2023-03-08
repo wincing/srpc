@@ -8,7 +8,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>srpc-use-example</artifactId>
+  <artifactId>srpc-examples</artifactId>
+  <modules>
+    <module>srpc-example-provider</module>
+    <module>srpc-example-consumer</module>
+  </modules>
+
+  <packaging>pom</packaging>
 
   <properties>
     <maven.compiler.source>8</maven.compiler.source>

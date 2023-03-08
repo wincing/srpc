@@ -7,6 +7,8 @@ import org.jundeng.srpc.common.extension.ExtensionLoader;
 import org.jundeng.srpc.core.compress.CompressType;
 import org.jundeng.srpc.core.compress.Compressor;
 import org.jundeng.srpc.core.network.message.MessageConstants;
+import org.jundeng.srpc.core.network.message.Request;
+import org.jundeng.srpc.core.network.message.Response;
 import org.jundeng.srpc.core.network.message.SRpcMessage;
 import org.jundeng.srpc.core.network.message.SRpcMessageHeader;
 import org.jundeng.srpc.core.serializer.SerializeType;
@@ -91,10 +93,15 @@ public class SRpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         byte[] messageBody = new byte[bodyLength];
         msg.readBytes(messageBody);
 
-        // 先解压再反序列化
+        // 解压
         Compressor compressor = ExtensionLoader.getExtensionLoader(Compressor.class).getExtension(compressType.getName());
+        byte[] decompressedBytes = compressor.decompress(messageBody);
+
+        // 反序列化
         Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(serializeType.getName());
-        srpcMessage.setMessageBody(serializer.serialize(compressor.compress(messageBody)));
+        Class<?> deSerializeClass = eventType == MessageConstants.EVENT_REQUEST ? Request.class : Response.class;
+
+        srpcMessage.setMessageBody(serializer.deserialize(decompressedBytes, deSerializeClass));
 
         return srpcMessage;
     }

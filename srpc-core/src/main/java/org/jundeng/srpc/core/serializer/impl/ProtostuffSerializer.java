@@ -34,7 +34,7 @@ public class ProtostuffSerializer implements Serializer {
     @SuppressWarnings("unchecked")
     public <T> T deserialize(byte[] bytes, Class<T> clazz) {
         try {
-            Schema<T> schema = (Schema<T>) cachedSchema.get(clazz);
+            Schema<T> schema = getSchema(clazz);
             T obj = schema.newMessage();
             ProtostuffIOUtil.mergeFrom(bytes, obj, schema);
             return obj;

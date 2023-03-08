@@ -51,7 +51,6 @@ public class RedisRegistry extends AbstractRegistry {
 
     private LoadBalance loadBalance;
 
-
     /** 续费服务守护线程 **/
     private final ScheduledExecutorService expireExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("SrpcRegistryExpireTimer", true));
 
@@ -66,6 +65,10 @@ public class RedisRegistry extends AbstractRegistry {
     /** 标记是否是服务治理中心 **/
     private boolean admin = false;
 
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
     public RedisRegistry() {
         initRedis();
 
@@ -73,6 +76,7 @@ public class RedisRegistry extends AbstractRegistry {
             @Override
             public void run() {
                 try {
+                    logger.debug("Defer service expired time");
                     deferExpired();
                 } catch (Throwable t) {
                     logger.error("Unexpected exception occur at defer expire time, cause: " + t.getMessage(), t);
@@ -165,6 +169,7 @@ public class RedisRegistry extends AbstractRegistry {
         try (Jedis jedis = jedisPool.getResource()) {
             success = jedis.hset(key, url, String.valueOf(System.currentTimeMillis() +  expirePeriod)) > 0;
             jedis.publish(key, Constants.REGISTER);
+            registered.add(serviceInfo); // 存入缓存
         } catch (Throwable t) {
            logger.error("Failed to register service to redis registry, service: " + url + ", cause: " + t.getMessage());
         }

@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.jundeng.srpc.common.extension.ExtensionLoader;
+import org.jundeng.srpc.common.util.StringUtil;
 import org.jundeng.srpc.core.compress.CompressType;
 import org.jundeng.srpc.core.network.client.RpcClientSocket;
 import org.jundeng.srpc.core.network.message.Request;
@@ -75,6 +76,9 @@ public class RpcInvocationHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // 获取需要访问的Service Provider地址
         String serviceUrl = findService();
+        if (StringUtil.isBlank(serviceUrl)) {
+            throw new RuntimeException("Can not find available Service!");
+        }
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setUrl(serviceUrl);
 

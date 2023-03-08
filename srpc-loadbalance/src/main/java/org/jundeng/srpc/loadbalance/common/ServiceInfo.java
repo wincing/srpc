@@ -1,5 +1,6 @@
 package org.jundeng.srpc.loadbalance.common;
 
+import java.util.Objects;
 import lombok.Data;
 import org.jundeng.srpc.common.util.StringUtil;
 
@@ -22,7 +23,7 @@ public class ServiceInfo {
         if (StringUtil.isBlank(url)) {
             throw new IllegalStateException("Can not solve service host because url is null!");
         }
-        int colon = url.indexOf(':');
+        int colon = url.lastIndexOf(':');
         if (colon == -1) {
             throw new IllegalStateException("Url format error!");
         }
@@ -33,10 +34,30 @@ public class ServiceInfo {
         if (StringUtil.isBlank(url)) {
             throw new IllegalStateException("Can not solve service port because url is null!");
         }
-        int colon = url.indexOf(':');
+        int colon = url.lastIndexOf(':');
         if (colon == -1) {
             throw new IllegalStateException("Url format error!");
         }
         return Integer.valueOf(url.substring(colon + 1));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) { // 判断是否为同一个对象
+            return true;
+        }
+        if (!(obj instanceof ServiceInfo)) { // 判断类型是否匹配
+            return false;
+        }
+        ServiceInfo other = (ServiceInfo) obj;
+
+        return Objects.equals(interfaceName, other.interfaceName) &&
+            Objects.equals(url, other.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(interfaceName, url);
+    }
+
 }

@@ -23,12 +23,12 @@ public class MessageConstants {
 
     public static final int COMPRESS_ID_LENGTH = 1;
 
-    public static final int STREAM_ID_LENGTH = 4;
+    public static final int STREAM_ID_LENGTH = 8;
 
     /**
      * 总长度字段的长度
      */
-    public static final int LENGTH_FILED_LENGTH = 2;
+    public static final int LENGTH_FILED_LENGTH = 4;
 
     /**
      * 消息头长度

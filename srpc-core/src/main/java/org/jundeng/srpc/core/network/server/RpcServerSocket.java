@@ -10,7 +10,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.SocketAddress;
+import org.jundeng.srpc.common.Constants;
 import org.jundeng.srpc.core.network.codec.RequestDecoder;
 import org.jundeng.srpc.core.network.codec.ResponseEncoder;
 import org.jundeng.srpc.core.network.codec.SRpcMessageDecoder;
@@ -28,6 +31,8 @@ public class RpcServerSocket implements Runnable {
 
     private ChannelFuture channelFuture;
 
+    private int port;
+
     @Override
     public void run() {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1); // 只需1个线程监听请求即可
@@ -43,18 +48,21 @@ public class RpcServerSocket implements Runnable {
                     ChannelPipeline pipeline = ch.pipeline();
 
                     pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
-                    pipeline.addLast("idleChecker", new ServerIdleCheckHandler());
 
                     pipeline.addLast("srpcMessageDecoder", new SRpcMessageDecoder());
                     pipeline.addLast("message2RequestDecoder", new RequestDecoder());
 
                     pipeline.addLast("srpcMessageEncoder", new SRpcMessageEncoder());
                     pipeline.addLast("response2MessageEncoder", new ResponseEncoder());
+
+                    pipeline.addLast("idleChecker", new ServerIdleCheckHandler());
+                    pipeline.addLast("serverRpcHandler", new RpcServerSocketHandler());
                 }
             });
 
         try {
-            this.channelFuture = serverBootstrap.bind(getAvailablePort()).sync();
+            this.port = getAvailablePort();
+            this.channelFuture = serverBootstrap.bind(this.port).sync();
             this.channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -79,5 +87,14 @@ public class RpcServerSocket implements Runnable {
             }
         }
         throw new RuntimeException("Unable to find a free port in range [" + MIN_PORT + ", " + MAX_PORT + "]");
+    }
+
+    public String getServiceUrl() {
+        if (channelFuture != null) {
+            InetSocketAddress localAddress = (InetSocketAddress) channelFuture.channel().localAddress();
+            String ip = localAddress.getHostString();
+            return ip + ":" + this.port;
+        }
+        return null;
     }
 }

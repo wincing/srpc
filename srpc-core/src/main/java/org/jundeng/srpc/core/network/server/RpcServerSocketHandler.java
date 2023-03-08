@@ -7,9 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.jundeng.srpc.common.extension.ExtensionLoader;
 import org.jundeng.srpc.core.network.message.Request;
 import org.jundeng.srpc.core.network.message.Response;
 import org.slf4j.Logger;
@@ -33,9 +33,14 @@ public class RpcServerSocketHandler extends SimpleChannelInboundHandler<Request>
             targetClazz = Class.forName(request.getInterfaceName());
         }
 
+        // 获取被调用方法
+        Method targetMethod;
         List<String> paramTypes = request.getParamTypes();
-        Class[] paramsClazz = new Class[paramTypes.size()];
-        if (!CollectionUtil.isEmpty(paramTypes)) {
+
+        if (CollectionUtil.isEmpty(paramTypes)) {
+            targetMethod = targetClazz.getMethod(request.getMethodName());
+        } else {
+            Class<?>[] paramsClazz = new Class[paramTypes.size()];
             for (int i = 0; i < paramTypes.size(); i++) {
                 String paramTypeName = paramTypes.get(i);
                 paramsClazz[i] = classCache.get(paramTypeName);
@@ -43,12 +48,13 @@ public class RpcServerSocketHandler extends SimpleChannelInboundHandler<Request>
                     Class.forName(paramTypes.get(i));
                 }
             }
+
+            targetMethod = targetClazz.getMethod(request.getMethodName(), paramsClazz);
         }
 
         // 反射调用
-        Method targetMethod = targetClazz.getMethod(request.getMethodName(), paramsClazz);
-        Object targetObj = targetClazz.newInstance();
-
+        Class<?> targetImplClass = ExtensionLoader.getExtensionLoader(targetClazz).getDefaultExtension().getClass();
+        Object targetObj = targetImplClass.newInstance();
         localInvokeThreadPool.submit(() -> asyncLocalInvoke(ctx, request, targetMethod, targetObj));
     }
 

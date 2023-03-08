@@ -12,7 +12,7 @@
     <module>srpc-registry</module>
     <module>srpc-loadbalance</module>
     <module>srpc-core</module>
-    <module>srpc-use-example</module>
+    <module>srpc-examples</module>
   </modules>
 
   <properties>
