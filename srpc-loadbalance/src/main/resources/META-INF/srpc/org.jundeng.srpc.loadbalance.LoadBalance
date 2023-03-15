@@ -1,0 +1,3 @@
+roundRobin=org.jundeng.srpc.loadbalance.impl.RoundRobinLoadBalance
+random=org.jundeng.srpc.loadbalance.impl.RandomLoadBalance
+smoothWeight=org.jundeng.srpc.loadbalance.impl.WeightedRoundRobinLoadBalance

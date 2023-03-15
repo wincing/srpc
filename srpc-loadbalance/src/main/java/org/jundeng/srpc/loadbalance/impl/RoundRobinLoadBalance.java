@@ -6,7 +6,7 @@ import org.jundeng.srpc.loadbalance.AbstractLoadBalance;
 import org.jundeng.srpc.loadbalance.common.ServiceInfo;
 
 /**
- * 轮询算法
+ * 轮询负载均衡算法
  */
 public class RoundRobinLoadBalance extends AbstractLoadBalance {
     /** 当前用的服务提供方下标 **/
@@ -14,7 +14,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
 
     @Override
     protected int calculateWeight(ServiceInfo serviceInfo) {
-        return 1;
+        return serviceInfo.getWeight();
     }
 
     @Override

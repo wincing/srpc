@@ -1,1 +1,0 @@
-default=org.jundeng.srpc.loadbalance.impl.RoundRobinLoadBalance
