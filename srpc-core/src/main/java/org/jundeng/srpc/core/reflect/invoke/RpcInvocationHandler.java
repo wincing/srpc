@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +32,7 @@ public class RpcInvocationHandler implements InvocationHandler {
     /** 客户端channel缓存， key: hostname:port **/
     private static final Map<String, Channel> channelCache = new ConcurrentHashMap<>();
 
-    private static  ExecutorService channelAttainedExecutorService = Executors.newFixedThreadPool(10);
+    private static ExecutorService channelAttainedExecutorService = Executors.newFixedThreadPool(10);
 
     private String interfaceName;
 
@@ -64,6 +65,7 @@ public class RpcInvocationHandler implements InvocationHandler {
         // 每隔0.5s尝试获取channel
         for (int i = 0; i < 10; i++) {
             if (channel != null) {
+                channelCache.put(serviceUrl, channel);
                 break;
             }
             Thread.sleep(500);
@@ -91,6 +93,15 @@ public class RpcInvocationHandler implements InvocationHandler {
         request.setArgs(args);
         request.setHost(serviceInfo.solveHost());
         request.setPort(serviceInfo.solvePort());
+
+        if (args != null && args.length != 0) {
+            List<String> paramTypes = new ArrayList<>();
+            for (Object arg : args) {
+                paramTypes.add(arg.getClass().getName());
+            }
+            // 请求方法参数类型
+            request.setParamTypes(paramTypes);
+        }
 
         // 获取连接
         Channel channel = connect(request, serviceUrl);

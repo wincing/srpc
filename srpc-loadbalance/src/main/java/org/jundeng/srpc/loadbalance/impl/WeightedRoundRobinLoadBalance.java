@@ -23,7 +23,7 @@ public class WeightedRoundRobinLoadBalance extends AbstractLoadBalance {
 
     @Override
     protected int calculateWeight(ServiceInfo serviceInfo) {
-        return serviceInfo.getWeight();
+        return serviceInfo.getWeight() == null? 1 : serviceInfo.getWeight();
     }
 
     @Override

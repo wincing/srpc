@@ -13,6 +13,7 @@
     <module>srpc-loadbalance</module>
     <module>srpc-core</module>
     <module>srpc-examples</module>
+      <module>srpc-performance-test</module>
   </modules>
 
   <properties>

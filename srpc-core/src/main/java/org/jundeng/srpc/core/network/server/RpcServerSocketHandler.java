@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.jundeng.srpc.common.extension.ExtensionLoader;
+import org.jundeng.srpc.common.util.PrimitiveTypes;
 import org.jundeng.srpc.core.network.message.Request;
 import org.jundeng.srpc.core.network.message.Response;
 import org.slf4j.Logger;
@@ -43,9 +44,15 @@ public class RpcServerSocketHandler extends SimpleChannelInboundHandler<Request>
             Class<?>[] paramsClazz = new Class[paramTypes.size()];
             for (int i = 0; i < paramTypes.size(); i++) {
                 String paramTypeName = paramTypes.get(i);
-                paramsClazz[i] = classCache.get(paramTypeName);
-                if (paramsClazz[i] == null) {
-                    Class.forName(paramTypes.get(i));
+                // 非基本类型
+                Class<?> primitiveClass = PrimitiveTypes.getPrimitiveClass(paramTypeName);
+                if (primitiveClass == null) {
+                    paramsClazz[i] = classCache.get(paramTypeName);
+                    if (paramsClazz[i] == null) {
+                        paramsClazz[i] = Class.forName(paramTypes.get(i));
+                    }
+                } else { // 基本类型或String
+                    paramsClazz[i] = primitiveClass;
                 }
             }
 
